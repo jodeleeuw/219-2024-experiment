@@ -1,9 +1,11 @@
 const jsPsych = initJsPsych();
 
+const trigger_box_html = `<div id="trigger-box" style="position: absolute; bottom:0; right:0; width:40px; height:40px; background-color:white;"></div>`
+
 const timeline = [];
 
 const welcome = {
-  type: jsPsychHtmlKeyboardResponse,
+  type: jsPsychHtmlKeyboardResponseRaf,
   stimulus: 'Welcome to the experiment. Press any key to begin.'
 };
 
@@ -12,7 +14,7 @@ timeline.push(welcome);
 const trial = [];
 
 const fixation = {
-  type: jsPsychHtmlKeyboardResponse,
+  type: jsPsychHtmlKeyboardResponseRaf,
   stimulus: '+',
   choices: "NO_KEYS",
   css_classes: ['fixation'],
@@ -25,10 +27,11 @@ const fixation = {
 };
 
 const word = {
-  type: jsPsychHtmlKeyboardResponse,
+  type: jsPsychHtmlKeyboardResponseRaf,
   stimulus: jsPsych.timelineVariable('word'),
+  prompt: trigger_box_html,
   choices: "NO_KEYS",
-  trial_duration: 16.67,
+  trial_duration: 16,
   css_classes: ['stimulus'],
   data: {
     task: 'word_display',
@@ -36,7 +39,7 @@ const word = {
 };
 
 const delay_fixation = {
-  type: jsPsychHtmlKeyboardResponse,
+  type: jsPsychHtmlKeyboardResponseRaf,
   stimulus: '+',
   choices: "NO_KEYS",
   trial_duration: 33.3,
@@ -47,7 +50,7 @@ const delay_fixation = {
 };
 
 const mask = {
-  type: jsPsychHtmlKeyboardResponse,
+  type: jsPsychHtmlKeyboardResponseRaf,
   stimulus: () => {
     const mask_length = jsPsych.timelineVariable('word').length;
     const mask = "&".repeat(mask_length);
@@ -62,10 +65,11 @@ const mask = {
 };
 
 const response = {
-  type: jsPsychHtmlKeyboardResponse,
+  type: jsPsychHtmlKeyboardResponseRaf,
   stimulus: "",
   choices: ['w', 'n'],
   trial_duration: 1500,
+  response_ends_trial: false,
   data: {
     is_word: jsPsych.timelineVariable('is_word'),
     word_type: jsPsych.timelineVariable('word_type'),
