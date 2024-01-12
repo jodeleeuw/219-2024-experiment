@@ -1,0 +1,19 @@
+html, body {
+    background-color: rgb(128,128,128);
+    color: rgb(20,20,20);
+}
+
+.stimulus {
+    font-size: 20px;
+    color: rgb(20,20,20)
+}
+
+.mask {
+    color: rgb(76,76,76);
+    font-size: 20px;
+}
+
+.fixation {
+    font-size: 20px;
+    color: rgb(20,20,20);
+}
