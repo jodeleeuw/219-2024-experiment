@@ -5,15 +5,18 @@ html, body {
 
 .stimulus {
     font-size: 20px;
+    font-family: monospace;
     color: rgb(20,20,20)
 }
 
 .mask {
     color: rgb(76,76,76);
     font-size: 20px;
+    font-family: monospace;
 }
 
 .fixation {
     font-size: 20px;
     color: rgb(20,20,20);
+    font-family: monospace;
 }
