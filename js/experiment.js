@@ -62,8 +62,9 @@ const practice = {
   type: jsPsychHtmlKeyboardResponseRaf,
   stimulus: `
   <p>You have now completed all 20 practice trials.</p> 
-  <p>Press any key to move on to the experiment.</p>
+  <p>Once the experimenter has left the room, press the spacebar to move on to the experiment.</p>
 `,
+  choices: [' '],
   post_trial_gap: 2000
 };
 
