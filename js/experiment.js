@@ -1,39 +1,12 @@
 const jsPsych = initJsPsych();
 
+const PIXEL_OFFSET = 35;
+
+const condition = jsPsych.randomization.sampleWithoutReplacement(['moral', 'fashion'], 1)[0];
+
 const timeline = [];
 
-const trigger_place_html = () => {
-  is_word = jsPsych.timelineVariable('is_word')
-  word_type = jsPsych.timelineVariable('word_type')
-  if (is_word == true && (word_type == 'fashion' || word_type == 'moral')) {
-    return `<div id="trigger-box" style="position: absolute; bottom:0; right:0; width:40px; height:40px; background-color:white;"></div>`
-  } else if (is_word == true && (word_type == 'non-fashion' || word_type == 'non-moral')) {
-    return `<div id="trigger-box" style="position: absolute; bottom:200px; right:0; width:40px; height:40px; background-color:white;"></div>`
-  } else if (is_word == false && (word_type == 'fashion' || word_type == 'moral')) {
-    return `<div id="trigger-box" style="position: absolute; bottom:400px; right:0; width:40px; height:40px; background-color:white;"></div>`
-  } else if (is_word == false && (word_type == 'non-fashion' || word_type == 'non-moral')) {
-    return `<div id="trigger-box" style="position: absolute; bottom:400px; right:0; width:40px; height:40px; background-color:white;"></div>
-      <div id="trigger-box" style="position: absolute; bottom:0px; right:0; width:40px; height:40px; background-color:white;"></div>`
-  } else {
-    return ` `
-  }
-}
-
-var subject_id = null;
-const subject_id_entry = {
-  type: jsPsychSurveyNumber,
-  questions: [
-    { prompt: "Please enter the participant's ID", name: "subject_id", required: true }
-  ],
-  on_finish: function (data) {
-    let sid = parseInt(data.response.subject_id);
-    subject_id = sid >= 10 ? sid.toString() : "0" + sid; // sets the global variable
-    jsPsych.data.addProperties({ subject_id: subject_id });
-  },
-  simulation_options: {
-    simulate: false
-  }
-}
+var subject_id = jsPsych.randomization.randomID(6);
 
 const waiting_to_start = {
   type: jsPsychHtmlKeyboardResponseRaf,
@@ -68,28 +41,14 @@ const practice = {
   post_trial_gap: 2000
 };
 
-const button = {
-  type: jsPsychHtmlButtonResponse,
-  stimulus: '<p> <strong> A or B? </strong></p>',
-  choices: ['A', 'B'],
-  prompt: "<p>Experimenter: Please choose A or B</p>",
-  data: {
-    task: 'button'
-  },
-  on_finish: (data) => {
-    data.experiment_order = data.response == 0 ? "moral-first" : "fashion-first"
-  }
-};
-
 const trial = [];
 
 const trial_practice = []
 
 const fixation = {
   type: jsPsychHtmlKeyboardResponseRaf,
-  stimulus: '+',
+  stimulus: '<p class="fixation">+</p>',
   choices: "NO_KEYS",
-  css_classes: ['fixation'],
   trial_duration: () => {
     var duration = Math.random() * 300 + 400; // min time is 400ms, max time is 700ms
     // round duration to the nearest 16.667 ms
@@ -102,8 +61,17 @@ var practice_word_count = 0;
 
 const word_practice = {
   type: jsPsychHtmlKeyboardResponseRaf,
-  stimulus: jsPsych.timelineVariable('word'),
-  prompt: trigger_place_html,
+  stimulus: ()=>{
+    const html = `
+      <div style="position: relative; width: 400px;">
+        <p class="fixation">+</p>
+        <div style="position: absolute; bottom: ${PIXEL_OFFSET}px; text-align: center; width:100%;">
+          <p class="stimulus">${jsPsych.timelineVariable('word')}</p>
+        </div>
+      </div>
+    `
+    return html;
+  },
   choices: "NO_KEYS",
   trial_duration: function () {
     if (practice_word_count < 4) {
@@ -116,11 +84,11 @@ const word_practice = {
     }
     else if (practice_word_count < 12) {
       practice_word_count++;
-      return 60;
+      return 50;
     }
     else if (practice_word_count < 16) {
       practice_word_count++;
-      return 30;
+      return 33;
     }
     else if (practice_word_count < 20) {
       practice_word_count++;
@@ -135,11 +103,19 @@ const word_practice = {
 
 const word = {
   type: jsPsychHtmlKeyboardResponseRaf,
-  stimulus: jsPsych.timelineVariable('word'),
-  prompt: trigger_place_html,
+  stimulus: ()=>{
+    const html = `
+    <div style="position: relative; width: 400px;">
+      <p class="fixation">+</p>
+      <div style="position: absolute; bottom: ${PIXEL_OFFSET}px; text-align: center; width:100%;">
+        <p class="stimulus">${jsPsych.timelineVariable('word')}</p>
+      </div>
+    </div>
+    `
+    return html;
+  },
   choices: "NO_KEYS",
   trial_duration: 17,
-  css_classes: ['stimulus'],
   data: {
     task: 'word_display',
   }
@@ -147,10 +123,11 @@ const word = {
 
 const delay_fixation = {
   type: jsPsychHtmlKeyboardResponseRaf,
-  stimulus: '+',
+  stimulus: ()=>{
+    return '<p class="fixation">+</p>'
+  },
   choices: "NO_KEYS",
   trial_duration: 34,
-  css_classes: ['fixation'],
   data: {
     task: 'post_word_fixation'
   }
@@ -161,12 +138,19 @@ const mask = {
   stimulus: () => {
     const mask_length = jsPsych.timelineVariable('word').length;
     const mask = "&".repeat(mask_length);
-    return mask;
+    const html = `
+    <div style="position: relative; width: 400px;">
+      <p class="fixation">+</p>
+      <div style="position: absolute; bottom: ${PIXEL_OFFSET}px; text-align: center; width:100%;">
+        <p class="mask">${mask}</p>
+      </div>
+    </div>
+    `
+    return html;
   },
   data: {
     task: 'mask'
   },
-  css_classes: ['mask'],
   choices: "NO_KEYS",
   trial_duration: 34, // deviation from original because we only could get 60Hz refresh
 };
@@ -202,20 +186,16 @@ const test_procedure_practice = {
   }
 }
 
-timeline.push(subject_id_entry, button, waiting_to_start, instruction, test_procedure_practice, practice);
+timeline.push(waiting_to_start, instruction, test_procedure_practice, practice);
 
 const fashion_shuffled = jsPsych.randomization.shuffle(fashion_stimuli);
 const fashion_blocks = [
-  fashion_shuffled.slice(0,100),
-  fashion_shuffled.slice(100,200),
-  fashion_shuffled.slice(200,300)
+  fashion_shuffled.slice(0,100)
 ]
 
 const moral_shuffled = jsPsych.randomization.shuffle(moral_stimuli);
 const moral_blocks = [
-  moral_shuffled.slice(0,100),
-  moral_shuffled.slice(100,200),
-  moral_shuffled.slice(200,300)
+  moral_shuffled.slice(0,100)
 ]
 
 const test_block_1_fashion = {
@@ -223,22 +203,6 @@ const test_block_1_fashion = {
   timeline_variables: fashion_blocks[0],
   data: {
     block: 1
-  }
-}
-
-const test_block_2_fashion = {
-  timeline: trial,
-  timeline_variables: fashion_blocks[1],
-  data: {
-    block: 2
-  }
-}
-
-const test_block_3_fashion = {
-  timeline: trial,
-  timeline_variables: fashion_blocks[2],
-  data: {
-    block: 3
   }
 }
 
@@ -250,136 +214,52 @@ const test_block_1_moral = {
   }
 }
 
-const test_block_2_moral = {
-  timeline: trial,
-  timeline_variables: moral_blocks[1],
-  data: {
-    block: 2
-  }
-}
-
-const test_block_3_moral = {
-  timeline: trial,
-  timeline_variables: moral_blocks[2],
-  data: {
-    block: 3
-  }
-}
-
-const block_break = {
-  type: jsPsychHtmlKeyboardResponseRaf,
-  stimulus: `
-    <p>You can take a short break.</p>
-    <p>Please wait for the experimenter to signal that you can continue.</p> 
-    <p>Once the experimenter has said you can continue, press the spacebar.</p>
-  `,
-  choices: [' '],
-  post_trial_gap: 2000
-}
-
 const test_procedure_fashion = {
-  timeline: [test_block_1_fashion, block_break, test_block_2_fashion, block_break, test_block_3_fashion],
+  timeline: [test_block_1_fashion],
   data: {
     phase: 'fashion'
   },
 }
 
 const test_procedure_moral = {
-  timeline: [test_block_1_moral, block_break, test_block_2_moral, block_break, test_block_3_moral],
+  timeline: [test_block_1_moral],
   data: {
     phase: 'moral'
   },
 }
 
-const if_procedure_f = {
-  timeline: [test_procedure_fashion],
-  conditional_function: function () {
-    // get the data from the button trial,
-    // and check which key was pressed
-    data = jsPsych.data.get().filter({ task: 'button' }).values()[0]
-    if (data.response == 1) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-}
-
-const if_procedure_m = {
-  timeline: [test_procedure_moral],
-  conditional_function: function () {
-    // get the data from the button trial,
-    // and check which key was pressed
-    data = jsPsych.data.get().filter({ task: 'button' }).values()[0]
-    if (data.response == 0) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-}
-
-const halfway_break = {
-  type: jsPsychHtmlKeyboardResponseRaf,
-  stimulus: `
-    <p>You are halfway done! You can take a short break.</p>
-    <p>Please wait for the experimenter to signal that you can continue.</p> 
-    <p>Once the experimenter has said you can continue, press the spacebar.</p>
-  `,
-  choices: [' '],
-  post_trial_gap: 2000
-};
-
-const if_procedure_f2 = {
-  timeline: [test_procedure_fashion],
-  conditional_function: function () {
-    // get the data from the previous trial,
-    // and check which key was pressed
-    data = jsPsych.data.get().filter({ task: 'button' }).values()[0]
-    if (data.response == 0) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-}
-
-const if_procedure_m2 = {
-  timeline: [test_procedure_fashion],
-  conditional_function: function () {
-    // get the data from the previous trial,
-    // and check which key was pressed
-    data = jsPsych.data.get().filter({ task: 'button' }).values()[0]
-    if (data.response == 1) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+if(condition == 'fashion') {
+  timeline.push(test_procedure_fashion);
+} else {
+  timeline.push(test_procedure_moral);
 }
 
 const debrief_block =
 {
   type: jsPsychHtmlKeyboardResponseRaf,
-  stimulus: `
-    <div style='width: 700px;'>
+  stimulus: ()=>{
+    const in_category_correct = jsPsych.data.get().filter({word_type: condition, is_word: true, correct: true}).count();
+    const in_category_incorrect = jsPsych.data.get().filter({word_type: condition, is_word: true, correct: false}).count();
+
+    const out_category_correct = jsPsych.data.get().filter({word_type: "non-"+condition , is_word: false, correct: true}).count();
+    const out_category_incorrect = jsPsych.data.get().filter({word_type: "non-"+condition, is_word: false, correct: false}).count();
+
+    return `<div style='width: 700px;'>
       <p>You have now completed the experiment.</p>
+      <p>You were shown ${condition} words and non-${condition} words.</p>
+      <p>For ${condition} words, you correctly identified ${in_category_correct} out of ${in_category_correct+in_category_incorrect}. This is ${Math.round(in_category_correct/(in_category_correct+in_category_incorrect)*100)}% correct.</p>
+      <p>For non-${condition} words, you correctly identified ${out_category_correct} out of ${out_category_correct+out_category_incorrect}. This is ${Math.round(out_category_correct/(out_category_correct+out_category_incorrect)*100)}% correct.</p>
       <p>Thank you for your participation.</p>
       <p>Please wait for the experimenter to return to the test room.</p>
-    </div>
-  `,
+    </div>`
+  },
   choices: "NO_KEYS",
   on_start: function () {
-    jsPsych.data.get().localSave('json', `219_2024_behavioral_${subject_id}.json`);
+    jsPsych.data.get().localSave('json', `219_behavioral_pilot_${subject_id}.json`);
   }
 };
 
 timeline.push(
-  if_procedure_m, 
-  if_procedure_f, 
-  halfway_break, 
-  if_procedure_f2, 
-  if_procedure_m2, 
   debrief_block
 );
 
