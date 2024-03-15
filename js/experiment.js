@@ -1,3 +1,5 @@
+const PIXEL_OFFSET = 35;
+
 const jsPsych = initJsPsych();
 
 const timeline = [];
@@ -87,7 +89,7 @@ const trial_practice = []
 
 const fixation = {
   type: jsPsychHtmlKeyboardResponseRaf,
-  stimulus: '+',
+  stimulus: '<p class="fixation">+</p>',
   choices: "NO_KEYS",
   css_classes: ['fixation'],
   trial_duration: () => {
@@ -102,7 +104,17 @@ var practice_word_count = 0;
 
 const word_practice = {
   type: jsPsychHtmlKeyboardResponseRaf,
-  stimulus: jsPsych.timelineVariable('word'),
+  stimulus: ()=>{
+    const html = `
+      <div style="position: relative; width: 400px;">
+        <p class="fixation">+</p>
+        <div style="position: absolute; bottom: ${PIXEL_OFFSET}px; text-align: center; width:100%;">
+          <p class="stimulus">${jsPsych.timelineVariable('word')}</p>
+        </div>
+      </div>
+    `
+    return html;
+  },
   prompt: trigger_place_html,
   choices: "NO_KEYS",
   trial_duration: function () {
@@ -116,11 +128,11 @@ const word_practice = {
     }
     else if (practice_word_count < 12) {
       practice_word_count++;
-      return 60;
+      return 50;
     }
     else if (practice_word_count < 16) {
       practice_word_count++;
-      return 30;
+      return 33;
     }
     else if (practice_word_count < 20) {
       practice_word_count++;
@@ -135,7 +147,17 @@ const word_practice = {
 
 const word = {
   type: jsPsychHtmlKeyboardResponseRaf,
-  stimulus: jsPsych.timelineVariable('word'),
+  stimulus: ()=>{
+    const html = `
+      <div style="position: relative; width: 400px;">
+        <p class="fixation">+</p>
+        <div style="position: absolute; bottom: ${PIXEL_OFFSET}px; text-align: center; width:100%;">
+          <p class="stimulus">${jsPsych.timelineVariable('word')}</p>
+        </div>
+      </div>
+    `
+    return html;
+  },
   prompt: trigger_place_html,
   choices: "NO_KEYS",
   trial_duration: 17,
@@ -147,7 +169,7 @@ const word = {
 
 const delay_fixation = {
   type: jsPsychHtmlKeyboardResponseRaf,
-  stimulus: '+',
+  stimulus: '<p class="fixation">+</p>',
   choices: "NO_KEYS",
   trial_duration: 34,
   css_classes: ['fixation'],
@@ -161,7 +183,15 @@ const mask = {
   stimulus: () => {
     const mask_length = jsPsych.timelineVariable('word').length;
     const mask = "&".repeat(mask_length);
-    return mask;
+    const html = `
+    <div style="position: relative; width: 400px;">
+      <p class="fixation">+</p>
+      <div style="position: absolute; bottom: ${PIXEL_OFFSET}px; text-align: center; width:100%;">
+        <p class="mask">${mask}</p>
+      </div>
+    </div>
+    `
+    return html;
   },
   data: {
     task: 'mask'
@@ -370,7 +400,7 @@ const debrief_block =
   `,
   choices: "NO_KEYS",
   on_start: function () {
-    jsPsych.data.get().localSave('json', `219_2024_behavioral_${subject_id}.json`);
+    jsPsych.data.get().localSave('json', `219_2024_v2_behavioral_${subject_id}.json`);
   }
 };
 
