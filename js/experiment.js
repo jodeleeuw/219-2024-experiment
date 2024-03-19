@@ -49,12 +49,13 @@ const waiting_to_start = {
 
 const instruction = {
   type: jsPsychHtmlKeyboardResponseRaf,
+  choices: [' '],
   stimulus: `
   <div style='width: 700px;'>
     <p>Please keep your eyes fixed on the central cross the entire time and do your best to minimize blinking.</p>
-    <p>On each trial decide if you see a word or a non-word at fixation before the &&&&&&'s.</p>
+    <p>On each trial decide if you see a word or a non-word before the &&&&&&'s.</p>
     <p>Press 1 if you see a word, and press 5 if you see a non-word.</p>
-    <p>Let the experimenter know if you have any questions. Press any key to begin the practice session.</p>
+    <p>Let the experimenter know if you have any questions. Press the spacebar to begin the practice session.</p>
   </div>
 `,
   post_trial_gap: 2000
@@ -63,7 +64,8 @@ const instruction = {
 const practice = {
   type: jsPsychHtmlKeyboardResponseRaf,
   stimulus: `
-  <p>You have now completed all 20 practice trials.</p> 
+  <p>You have now completed all 20 practice trials.</p>
+  <p>Remember to press 1 if you see a word, and press 5 if you see a non-word.</p>
   <p>Once the experimenter has left the room, press the spacebar to move on to the experiment.</p>
 `,
   choices: [' '],
@@ -300,6 +302,7 @@ const block_break = {
   type: jsPsychHtmlKeyboardResponseRaf,
   stimulus: `
     <p>You can take a short break.</p>
+    <p>Remember to press 1 if you see a word, and press 5 if you see a non-word.</p>
     <p>Please wait for the experimenter to signal that you can continue.</p> 
     <p>Once the experimenter has said you can continue, press the spacebar.</p>
   `,
@@ -353,6 +356,7 @@ const halfway_break = {
   type: jsPsychHtmlKeyboardResponseRaf,
   stimulus: `
     <p>You are halfway done! You can take a short break.</p>
+    <p>Remember to press 1 if you see a word, and press 5 if you see a non-word.</p>
     <p>Please wait for the experimenter to signal that you can continue.</p> 
     <p>Once the experimenter has said you can continue, press the spacebar.</p>
   `,
