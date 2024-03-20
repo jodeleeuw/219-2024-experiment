@@ -379,7 +379,7 @@ const if_procedure_f2 = {
 }
 
 const if_procedure_m2 = {
-  timeline: [test_procedure_fashion],
+  timeline: [test_procedure_moral],
   conditional_function: function () {
     // get the data from the previous trial,
     // and check which key was pressed
